@@ -29,7 +29,7 @@ class Piece:
 
     def place(self, matrix):
         for coord in self._coords:
-            row_global, col_global = self.get_global_coord(coord)
+            row_global, col_global = self.get_global_coord(coord,  self._pos)
 
             if 0 <= row_global < self._board.rows and 0 <= col_global < self._board.cols:
                 matrix[row_global][col_global] = Block(type=self._type)
@@ -62,9 +62,9 @@ class Piece:
             if row >= 0:
                 matrix[row][col] = Block(type='gost')
 
-    def get_global_coord(self, coord):
-        row = coord[0] + self._pos[0]
-        col = coord[1] + self._pos[1]
+    def get_global_coord(self, coord, pos):
+        row = coord[0] + pos[0]
+        col = coord[1] + pos[1]
 
         return (row, col)
 
@@ -73,7 +73,7 @@ class Piece:
             return
 
         for coord in self._coords:
-            row, col = self.get_global_coord(coord)
+            row, col = self.get_global_coord(coord,  self._pos)
 
             if self._board.is_empty_coord((row + 1, col)):
                 continue
@@ -98,7 +98,7 @@ class Piece:
             return
 
         for coord in self._coords:
-            row, col = self.get_global_coord(coord)
+            row, col = self.get_global_coord(coord,  self._pos)
 
             if self._board.is_empty_coord((row, col + 1)):
                 continue
@@ -112,7 +112,7 @@ class Piece:
             return
 
         for coord in self._coords:
-            row, col = self.get_global_coord(coord)
+            row, col = self.get_global_coord(coord,  self._pos)
 
             if self._board.is_empty_coord((row, col - 1)):
                 continue
@@ -127,15 +127,59 @@ class Piece:
         if self._type == 'o':
             return
 
-        temp_coords = copy.deepcopy(self._coords)
+        new_coords = copy.deepcopy(self._coords)
+        temp_pos = copy.deepcopy(self._pos)
+        
+        loops = 0
+        moves = 0
 
-        for coord in temp_coords:
+        while not self.can_rotate(new_coords, temp_pos)[0]:
+            direction = self.can_rotate(new_coords, temp_pos)[1]
+
+            loops += 1
+
+            if direction > 0:
+                moves -= 1
+                temp_pos[1] -= 1
+
+            elif direction < 0:
+                moves += 1
+                temp_pos[1] += 1
+
+            if loops > 5:
+                return
+
+        if moves > 0:
+            for _ in range(moves):
+                self.move_right()
+
+        elif moves < 0:
+            for _ in range(abs(moves)):
+                self.move_left()
+    
+        for coord in new_coords:
             coord.reverse()
             coord[0] = -coord[0]
 
-            coord = self.get_global_coord(coord)
+            coord = self.get_global_coord(coord, self._pos)
 
             if not self._board.is_empty_coord(coord):
                 return
 
-        self._coords = temp_coords
+        self._coords = new_coords
+
+    def can_rotate(self, coords, pos):
+        coords = copy.deepcopy(coords)
+
+        for coord in coords:
+            coord.reverse()
+            coord[0] = -coord[0]
+
+            coord = self.get_global_coord(coord, pos)
+
+            direction = coord[1] - pos[1]
+
+            if not self._board.is_empty_coord(coord):
+                return False, direction
+
+        return True, None
