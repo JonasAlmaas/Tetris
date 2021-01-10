@@ -1,6 +1,6 @@
-from .window import Window
 from .board import Board
 from .input_handler import InputHandler
+from .window import Window
 
 
 class Application:
@@ -8,9 +8,9 @@ class Application:
         self.window = Window(title='Tetris', width=1280, height=1000)
         self.input_handler = InputHandler(app=self)
         self.new_board()
-        self.loop()
+        self.main()
 
-    def loop(self):
+    def main(self):
         self.running = True
 
         while self.running:
