@@ -58,13 +58,13 @@ class Board:
     def next_round(self):
         self.active_piece.place(self.matrix)
 
-        self.new_piece()
-        self.check_for_full_row()
-
         for col in range(self.cols):
             if self.matrix[0][col].type != 'empty':
                 self.game_running = False
                 return
+
+        self.new_piece()
+        self.check_for_full_row()
 
     def check_for_full_row(self):
         full_rows = 0
@@ -106,7 +106,9 @@ class Board:
 
         try:
             if row < 0:
-                return True
+                if col > 0:
+                    if col < self.cols:
+                        return True
             
             if col < 0:
                 return False
