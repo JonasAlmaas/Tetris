@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import time
 
 from .piece import Piece
 from .block import Block
@@ -7,6 +8,9 @@ from .block import Block
 
 class Board:
     def __init__(self, display=None, rows: int = 20, cols: int = 10, margin_board: int = 30, margin_block: int = 1):
+        self._tick_rate = 2
+        self.last_update = 0
+
         self.display = display
         self.game_running = True
 
@@ -31,16 +35,30 @@ class Board:
         self.new_piece()
 
     def think(self):
-        self.draw()
+        if time.time() - self.last_update > 1 / self._tick_rate:
+            if self.game_running:
+                self.active_piece.move_down()
 
-        if self.game_running:
-            self.active_piece.move_down()
+            self.reset_update_time()
+            self.draw()
+
+    def check_tick_rate(self):
+        if self._score < 2500:
+            self._tick_rate = 2
+        
+        elif self._score < 5000:
+            self._tick_rate = 3
+
+        elif self._score < 15000:
+            self._tick_rate = 4
+
+    def reset_update_time(self):
+        self.last_update = time.time()
 
     def next_round(self):
         self.active_piece.place(self.matrix)
 
         self.new_piece()
-
         self.check_for_full_row()
 
         for col in range(self.cols):
@@ -60,11 +78,16 @@ class Board:
             if is_full_row:
                 self.remove_row(row)
                 full_rows += 1
+        
+        if not full_rows:
+            return
 
         if full_rows != 4:
             self._score += full_rows * 100
         else:
             self._score += full_rows * 100 * 2
+
+        self.check_tick_rate()
 
     def remove_row(self, row):
         for col in range(self.cols):

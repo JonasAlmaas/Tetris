@@ -12,15 +12,18 @@ class InputHandler:
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.app.reset()
+                    self.app.new_board()
+                
+                elif event.key == pygame.K_f:
+                    self.app.window.toggle_fullscreen()
 
                 elif event.key == pygame.K_SPACE:
-                    self.app.reset_update_time()
+                    self.app.board.reset_update_time()
                     self.app.board.active_piece.hard_drop()
                     self.app.board.draw()
 
                 elif event.key == pygame.K_DOWN:
-                    self.app.reset_update_time()
+                    self.app.board.reset_update_time()
                     self.app.board.active_piece.move_down()
                     self.app.board.draw()
                 
@@ -32,6 +35,6 @@ class InputHandler:
                     self.app.board.active_piece.move_right()
                     self.app.board.draw()
 
-                elif event.key == pygame.K_z:
+                elif event.key == pygame.K_UP:
                     self.app.board.active_piece.rotate()
                     self.app.board.draw()
