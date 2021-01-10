@@ -1,12 +1,14 @@
-from .board import Board
 from .input_handler import InputHandler
 from .window import Window
+from .board import Board
+from .music import Music
 
 
 class Application:
     def __init__(self):
-        self.window = Window(title='Tetris', width=1280, height=1000)
         self.input_handler = InputHandler(app=self)
+        self.window = Window(title='Tetris', width=1280, height=1000)
+        self.music = Music()
         self.new_board()
         self.main()
 

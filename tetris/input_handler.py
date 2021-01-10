@@ -14,8 +14,8 @@ class InputHandler:
                 if event.key == pygame.K_ESCAPE:
                     self.app.new_board()
                 
-                elif event.key == pygame.K_f:
-                    self.app.window.toggle_fullscreen()
+                elif event.key == pygame.K_m:
+                    self.app.music.toggle_mute()
 
                 elif event.key == pygame.K_SPACE:
                     self.app.board.reset_update_time()
