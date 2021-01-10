@@ -11,7 +11,8 @@ class Board:
         self.game_running = True
 
         self._score = 0
-        self.font = pygame.font.SysFont(None, 50)
+        self.font_score = pygame.font.SysFont(None, 50)
+        self.font_game_over = pygame.font.SysFont(None, 72)
 
         self.rows = rows
         self.cols = cols
@@ -20,7 +21,6 @@ class Board:
         self._margin_block = margin_block
 
         self._bg_color = pygame.Color('#303030')
-        self.new_piece_pos = [-1, self.cols // 2]
 
         self.matrix = []
         for row in range(self.rows):
@@ -31,9 +31,10 @@ class Board:
         self.new_piece()
 
     def think(self):
+        self.draw()
+
         if self.game_running:
             self.active_piece.move_down()
-            self.draw()
 
     def next_round(self):
         self.active_piece.place(self.matrix)
@@ -45,7 +46,6 @@ class Board:
         for col in range(self.cols):
             if self.matrix[0][col].type != 'empty':
                 self.game_running = False
-                print('Game Over')
                 return
 
     def check_for_full_row(self):
@@ -96,13 +96,15 @@ class Board:
     def draw(self):
         self.display.fill(pygame.Color('#454545'))
 
-        height = self.display.get_size()[1] - self._margin_board * 3
-        width = height / self.rows * self.cols
-        pos_x = self.display.get_size()[0] / 2 - width / 2
-        pos_y = self._margin_board * 2
-        pygame.draw.rect(self.display, self._bg_color,(pos_x, pos_y, width + self._margin_block, height + self._margin_block))
+        board_height = self.display.get_size()[1] - self._margin_board * 3
+        board_width = board_height / self.rows * self.cols
 
-        score = self.font.render(str(self._score), True, pygame.Color('#ffffff'))
+        board_x = self.display.get_size()[0] / 2 - board_width / 2
+        board_y = self._margin_board * 2
+
+        pygame.draw.rect(self.display, self._bg_color,(board_x, board_y, board_width + self._margin_block, board_height + self._margin_block))
+
+        score = self.font_score.render(str(self._score), True, pygame.Color('#ffffff'))
         score_pos = self.display.get_size()[0] // 2 - score.get_rect().width // 2, self._margin_board - score.get_rect().height // 2
         self.display.blit(score, score_pos)
 
@@ -110,17 +112,36 @@ class Board:
         self.active_piece.place_gost(matrix=temp_matrix)
         self.active_piece.place(matrix=temp_matrix)
 
-        block_size = width / self.cols - self._margin_block
+        block_size = board_width / self.cols - self._margin_block
 
         for row in range(self.rows):
             for col in range(self.cols):
-                block_x = col * (width / self.cols) + pos_x + self._margin_block
-                block_y = row * (width / self.cols) + pos_y + self._margin_block
+                block_x = col * (board_width / self.cols) + board_x + self._margin_block
+                block_y = row * (board_width / self.cols) + board_y + self._margin_block
 
                 color = temp_matrix[row][col].color
                 pygame.draw.rect(self.display, color,(block_x, block_y, block_size, block_size))
 
+        if not self.game_running:
+            self.draw_game_over()
+
         pygame.display.update()
+
+    def draw_game_over(self):
+        board_height = self.display.get_size()[1] - self._margin_board * 3
+        board_width = board_height / self.rows * self.cols
+
+        board_x = self.display.get_size()[0] / 2 - board_width / 2
+        board_y = self._margin_board * 2
+
+        board = pygame.Surface((board_width, board_height))
+        board.set_alpha(200)
+        board.fill(self._bg_color)
+        self.display.blit(board, (board_x, board_y))
+
+        game_over = self.font_game_over.render('GAME OVER', True, pygame.Color('#ffffff'))
+        game_over_pos = self.display.get_size()[0] // 2 - game_over.get_rect().width // 2, self.display.get_size()[1] // 2 - game_over.get_rect().height // 2
+        self.display.blit(game_over, game_over_pos)
 
     def new_piece(self):
         self.active_piece = Piece(board=self)

@@ -1,8 +1,6 @@
 import random
 import copy
 
-from numpy.core.numeric import True_
-
 from .block import Block
 
 
@@ -20,7 +18,7 @@ types = {
 class Piece:
     def __init__(self, board):
         self._board = board
-        self._pos = copy.copy(self._board.new_piece_pos)
+        self._pos = [-1, self._board.cols // 2]
         self._type = random.choice(list(types.keys()))
         self._coords = types[self._type]
 
