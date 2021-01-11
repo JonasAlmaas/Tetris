@@ -13,7 +13,7 @@ class InputHandler:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.app.new_board()
-                
+
                 elif event.key == pygame.K_m:
                     self.app.music.toggle_mute()
 
@@ -26,7 +26,7 @@ class InputHandler:
                     self.app.board.reset_update_time()
                     self.app.board.active_piece.move_down()
                     self.app.board.draw()
-                
+
                 elif event.key == pygame.K_LEFT:
                     self.app.board.active_piece.move_left()
                     self.app.board.draw()
