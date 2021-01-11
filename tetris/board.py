@@ -106,7 +106,7 @@ class Board:
 
         try:
             if row < 0:
-                if col > 0:
+                if col >= 0:
                     if col < self.cols:
                         return True
             
